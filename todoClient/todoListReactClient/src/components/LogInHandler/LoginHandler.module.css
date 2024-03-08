@@ -1,0 +1,31 @@
+
+
+.MainContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 35rem;
+    width: 30rem;
+    gap: 2rem;
+
+}
+.mainForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+.EmailInput, .PasswordInput{
+    display: flex;
+    flex-direction: column;
+    width: 30rem;
+}
+.EmailInput label, .PasswordInput label{
+    font-size: 1.25rem;
+}
+.EmailInput input, .PasswordInput input{
+    padding: 0.5rem 1rem;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 1rem;
+}

@@ -1,0 +1,42 @@
+services:
+        client: 
+              image: joseluisq/static-web-server:2
+              volumes: 
+                - ./todoClient:/client/public/
+              ports:
+                - 8080:80
+      
+        server: 
+              image: node:20-bookworm-slim
+              command: ["node", "--watch", "--env-file=.env", "./app/server.js"]
+              ports: 
+                - 3000:3000
+              volumes:
+                - ./todoServer:/app/
+
+        postgres:
+              image: postgres:latest
+              ports: 
+                - 5432:5432
+              expose:
+                - 5432
+              volumes:
+                - ./postgres:/var/lib/postgresql/data
+              environment:
+                - POSTGRES_PASSWORD=1234
+                - POSTGRES_USER=John
+                - POSTGRES_DB=todoDB
+        
+        pgAdmin:
+              image: dpage/pgadmin4
+              container_name: pgadmin4_container
+              restart: always
+              ports: 
+                - "5050:80"
+              environment:
+                PGADMIN_DEFAULT_EMAIL: johnb08.kodehode@gmail.com
+                PGADMIN_DEFAULT_PASSWORD: 1234
+              volumes: 
+                - pgadmin-data:/var/lib/pgadmin
+volumes:
+  pgadmin-data:

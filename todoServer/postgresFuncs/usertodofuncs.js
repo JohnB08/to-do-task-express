@@ -1,0 +1,74 @@
+import { db } from "../db/db.js";
+export const findUser = async (username) => {
+    try {
+        const data = await db.query(`
+        SELECT user_id
+        FROM Todousers
+        WHERE username = '${username}'
+        `);
+        return { success: true, data };
+    }
+    catch (error) {
+        return { success: false, error };
+    }
+};
+export const fetchTodoId = async (userId) => {
+    try {
+        const data = await db.query(`
+        SELECT todo_id
+        FROM Todoitem_User_Relationship
+        WHERE user_id = ${userId}
+        `);
+        return { success: true, data };
+    }
+    catch (error) {
+        return { success: false, error };
+    }
+};
+export const fetchTodoItems = async (userId) => {
+    try {
+        const data = await db.query(`
+        SELECT * FROM fetchTodoItemsByUserId(${userId})
+        `);
+        const todoItems = data.rows.map(row => {
+            return {
+                todoItem: row.todoItem,
+                dateCreaded: row.dateCreated,
+                isComplete: row.isComplete,
+                isDeleted: row.isDeleted,
+            };
+        });
+        return {
+            success: true, todoItems
+        };
+    }
+    catch (error) {
+        return { success: false, error };
+    }
+};
+export const insertTodoItem = async (todoObject) => {
+    const { todoItem, dateCreated } = todoObject;
+    try {
+        const data = await db.query(`
+        INSERT INTO Todoitems (todoItem, dateCreated)
+        VALUES ('${todoItem}', ${dateCreated})
+        RETURNING todo_id
+        `);
+        return { success: true, data };
+    }
+    catch (error) {
+        return { success: false, error };
+    }
+};
+export const updateUserTable = async (userId, todoId) => {
+    try {
+        const data = await db.query(`
+        INSERT INTO Todoitem_User_Relation (user_id, todo_id)
+        VALUES (${userId}, ${todoId})
+        `);
+        return { success: true, data };
+    }
+    catch (error) {
+        return { success: false, error };
+    }
+};
