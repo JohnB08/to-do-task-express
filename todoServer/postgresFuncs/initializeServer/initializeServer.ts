@@ -15,7 +15,7 @@ const createUserTable = async() =>{
 const createTodoLists = async () =>{
     try{
         const data = await db.query(`
-        CREATE TABLE TodoItems ( todo_id SERIAL PRIMARY KEY,  todoItem VARCHAR(255), isComplete BOOLEAN DEFAULT FALSE, isDeleted BOOLEAN DEFAULT FALSE, dateCreated VARCHAR(255))
+        CREATE TABLE TodoItems ( todo_id SERIAL PRIMARY KEY,  todoItem VARCHAR(255), isComplete BOOLEAN DEFAULT FALSE, isDeleted BOOLEAN DEFAULT FALSE, dateCreated DATE DEFAULT CURRENT_DATE)
         `)
         return {success: true, data}
     } catch(error){

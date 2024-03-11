@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { initializeServer } from "./postgresFuncs/initializeServer/initializeServer.js";
 import { verifyUserToken } from "./firebase/firebaseVerifier/firebaseVerifier.js";
+import { postNewUser } from "./postgresFuncs/usertodofuncs.js";
 
 const server = express();
 const port = 3000
@@ -28,5 +29,21 @@ server.get("/CreateNewUser", async (req, res)=>{
             }
         })
     }
-    
+    const userID = verifiedToken.userPayload?.uid
+    const createNewUser = await postNewUser(userID as string)
+    if (!createNewUser.success){
+        return res.status(500).json({
+            error: {
+                message: "Internal Server Error. Please try again later."
+            }
+        })
+    }
+    return res.status(200).json({
+        message: "User created successfully!"
+    })
+
+})
+
+server.listen(port, ()=>{
+    console.log(`Server listening at ${port}`)
 })

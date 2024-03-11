@@ -8,7 +8,7 @@ services:
       
         server: 
               image: node:20-bookworm-slim
-              command: ["node", "--watch", "--env-file=.env", "./app/server.js"]
+              command: ["node", "--env-file=/app/.env", "./app/server.js"]
               ports: 
                 - 3000:3000
               volumes:
