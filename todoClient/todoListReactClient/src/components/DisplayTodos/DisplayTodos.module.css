@@ -1,0 +1,18 @@
+.TodoItem{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.Button{
+    width: 20%;
+}
+.Button:disabled{
+    color:var(--lightBg);
+    background-color: var(--darkBg);
+}
+.Date{
+max-width: 10%;
+}
+.Item{
+    width: 30%;
+}

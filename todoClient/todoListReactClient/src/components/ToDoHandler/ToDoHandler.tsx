@@ -1,5 +1,5 @@
 import { fetchInitialTodos } from "../../assets/expressServerFetch/initialTodoFetch";
-import { useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import { SignOut } from "../SignOut/SignOut";
 import { AddTodo } from "../AddTodo/AddTodo";
 import { TodoObject, Response } from "../../assets/fetchedDataTypes/datatypes";
@@ -64,19 +64,69 @@ export const ToDoHandler = () => {
         console.log(result)
         setResponse(result)
     }
+    async function handleDelete(event: React.MouseEvent<HTMLButtonElement>){
+        const target = event.target as typeof event.target & {
+            value: string
+        }
+        const index = Number(target.value)
+        console.log(index, typeof index)
+        const newArray = [...todoArray]
+        newArray[index].isDeleted = true
+        setTodoArray(newArray)
+        const auth = getAuth()
+        const userId = await auth.currentUser?.getIdToken()
+        const options: RequestInit = {
+            method: "POST",
+            headers: {
+                id_token: userId as string,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newArray)
+        }
+        console.log(options)
+        const result: Response = await postResults(options)
+        console.log(result)
+        setResponse(result)
+    }
+    async function handleComplete(event: React.MouseEvent<HTMLButtonElement>){
+        const target = event.target as typeof event.target & {
+            value: string
+        }
+        const index = Number(target.value)
+        console.log(index, typeof index)
+        const newArray = [...todoArray]
+        newArray[index].isComplete = true
+        setTodoArray(newArray)
+        const auth = getAuth()
+        const userId = await auth.currentUser?.getIdToken()
+        const options: RequestInit = {
+            method: "POST",
+            headers: {
+                id_token: userId as string,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newArray)
+        }
+        console.log(options)
+        const result: Response = await postResults(options)
+        console.log(result)
+        setResponse(result)
+    }
     return (
-        <>
-        <AddTodo handleSubmit={makeNewTodo}/>
-        {response ? response.error? response.error.message : response.success.message : ""}
-        <div className={Style.todoOutput}>
-            {todoArray.map((element, index)=>{
-                console.log(element)
-                return <DisplayTodos todoObject={element} key={index}/>
+        <div className={Style.TodoContainer}>
+            <AddTodo handleSubmit={makeNewTodo}/>
+            <div className={Style.todoOutput}>
+                {todoArray.map((element, index)=>{
+                    console.log(element)
+                    return <DisplayTodos todoObject={element} key={index} updateComplete={handleComplete} updateDeleted={handleDelete} objectIndex={index}/>
                 }
-            )}
+                )}
+            </div>
+            <div className={Style.BtnContainer}>
+                {response ? response.error? response.error.message : response.success.message : ""}
+                <SignOut className={[Style.SignOutBtn, "button"].join(" ")}/>
+            </div>
         </div>
-        <SignOut className={[Style.SignOutBtn, "button"].join(" ")}/>
-        </>
     )
 }
 

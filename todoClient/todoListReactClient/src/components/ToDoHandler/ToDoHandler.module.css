@@ -1,0 +1,18 @@
+.TodoContainer{
+    min-width: 3.5rem;
+}
+
+.BtnContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+
+}
+.SignOutBtn{
+    margin-left: auto;
+    max-width: 20%;
+
+}
+
+

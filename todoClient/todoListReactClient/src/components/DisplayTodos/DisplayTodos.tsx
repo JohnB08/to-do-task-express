@@ -5,10 +5,13 @@ import Style from "./DisplayTodos.module.css"
 
 type DisplayTodoProps = {
     todoObject: TodoObject
+    updateComplete: (event: React.MouseEvent<HTMLButtonElement>)=>void
+    updateDeleted: (event: React.MouseEvent<HTMLButtonElement>)=>void
+    objectIndex: number
 }
 
 
-export const DisplayTodos = ({todoObject}:DisplayTodoProps) =>{
+export const DisplayTodos = ({todoObject, updateComplete, updateDeleted, objectIndex}:DisplayTodoProps) =>{
     const dateCreated = new Date(Date.parse(todoObject.dateCreated))
     console.log(todoObject.dateCreated)
     const dateOptions: Intl.DateTimeFormatOptions = {
@@ -17,21 +20,17 @@ export const DisplayTodos = ({todoObject}:DisplayTodoProps) =>{
         month: "short",
         day: "numeric"
     }
+
     const localDate = dateCreated.toLocaleString("en", dateOptions)
-    const updateDeleted=()=>{
-        todoObject.isDeleted=true
-    }
-    const updateComplete=()=>{
-        todoObject.isComplete=true
-    }
     return(
         <>
+        {!todoObject.isDeleted ?
         <div className={Style.TodoItem}>
-            <p>{localDate}</p>
-            <p>{todoObject.todoItem}</p>
-            {todoObject.isComplete ? <button className={Style.Button} type="button" onClick={updateComplete}>Complete Todo</button> : <button className={Style.Button} type="button" disabled >Completed</button>}
-            {todoObject.isComplete ? <button className={Style.Button} type="button" onClick={updateDeleted}>Delete Todo</button> : <button className={Style.Button} type="button" disabled >Deleted</button>}
-        </div>
+            <p className={Style.Date}>{localDate}</p>
+            <p className={Style.Item}>{todoObject.todoItem}</p>
+            {!todoObject.isComplete ? <button className={Style.Button} type="button" value={objectIndex} onClick={updateComplete}>Complete Todo</button> : <button className={Style.Button} type="button" disabled >Completed</button>}
+            {!todoObject.isDeleted ? <button className={Style.Button} type="button" value={objectIndex} onClick={updateDeleted}>Delete Todo</button> : <button className={Style.Button} type="button" disabled >Deleted</button>}
+        </div>: ""}
         </>
     )
 }

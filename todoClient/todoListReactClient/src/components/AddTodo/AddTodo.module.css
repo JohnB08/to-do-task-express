@@ -1,0 +1,15 @@
+.form{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.Button{
+    width: 20%;
+}
+.Label{
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.Input{
+    padding: 0.25rem 0.5rem
+}
