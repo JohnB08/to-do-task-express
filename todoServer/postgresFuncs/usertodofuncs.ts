@@ -48,12 +48,15 @@ export const fetchTodoItems = async (userId: number) =>{
         SELECT * FROM fetchTodoItemsByUserId(${userId})
         `)
         const todoItems = data.rows.map(row=>{
-            return {
+            if (!row.isDeleted){
+                return {
+                todoId: row.todo_id,
                 todoItem: row.todoItem,
                 dateCreaded: row.dateCreated,
                 isComplete: row.isComplete,
                 isDeleted: row.isDeleted,
             }
+        }
         })
         return {
             success: true, todoItems
@@ -63,18 +66,41 @@ export const fetchTodoItems = async (userId: number) =>{
     }
 } 
 
-export const insertTodoItem = async (todoObject: TodoObject) =>{
+export const upDateTodoItem = async (todoObject: TodoObject) =>{
+    const {todoId, isComplete, isDeleted} = todoObject
+    try{
+        const data = await db.query(`
+        UPDATE TodoItems
+        SET isComplete = $1, isDeleted = $2
+        WHERE todo_id = $3
+        `, [isComplete, isDeleted, todoId])
+        return {success: true, data}
+    } catch (error){
+        return {success: false, error}
+    }
+}
+
+export const insertTodoItem = async (todoObject: TodoObject, id: number) =>{
     const {todoItem, dateCreated} = todoObject
     try {
         const data = await db.query(`
         INSERT INTO Todoitems (todoItem, dateCreated)
-        VALUES ('${todoItem}', ${dateCreated})
+        VALUES ($1, $2)
         RETURNING todo_id
+        `, [todoItem, dateCreated])
+        const relData = await db.query(`
+        INSERT INTO Todoitem_User_Relation(user_id, todo_id)
+        VALUES (${id}, ${data.rows[0]})
         `)
-        return {success: true, data}
+        return {success: true, data, relData}
     } catch (error){
         return {success: false, error}
     } 
+}
+
+export const updateOrInsert = async (todoObject: TodoObject, user: string) =>{
+    const id = await findUser(user)
+    return todoObject.todoId ? await upDateTodoItem(todoObject) : await insertTodoItem(todoObject, id.data?.rows[0].user_id)
 }
 
 export const updateUserTable = async (userId: number, todoId: number)=>{

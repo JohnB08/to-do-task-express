@@ -13,26 +13,27 @@ const firebaseConfig = {
     appId: import.meta.env.VITE_FIREBASE_APPID,
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENTID
 }
-console.log(firebaseConfig)
+
 export const firebaseAuthHandler = initializeApp(firebaseConfig)
-console.log(firebaseAuthHandler)
 
 export const userStatus = () =>{
     const [user, setUser] = useState<User | null>(null)
+    const [userToken, setUserToken] = useState<string|null>(null)
+    console.log(userToken)
     useEffect(()=>{
         const auth = getAuth(firebaseAuthHandler)
         console.log(auth)
-        const userState = onAuthStateChanged(auth, (user)=>{
+        const userState = onAuthStateChanged(auth, async (user)=>{
             if (user){
-                console.log("user is signed out")
-                console.log(user)
                 setUser(user)
+                setUserToken(await auth.currentUser?.getIdToken() as string)
             } else {
                 console.log("user is signed out")
                 setUser(null)
+                setUserToken(null)
             }
         })
         return userState
     }, [])
-    return [user]
+    return [user, userToken]
 }

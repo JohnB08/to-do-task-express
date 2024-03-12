@@ -1,9 +1,9 @@
-import firebase from "../firebaseConfig/firebaseConfig.js"
+import { firebaseApp } from "../../postgresFuncs/initializeServer/initializeServer.js"
 
 export const verifyUserToken = async(userToken: string) =>{
     try{
-        const userPayload = await firebase.auth().verifyIdToken(userToken)
-        return {success: true, userPayload}
+        const userPayload = await firebaseApp.auth().verifyIdToken(userToken)
+        return {success: true, user: userPayload.uid}
     } catch (error){
         return {success: false, error}
     }

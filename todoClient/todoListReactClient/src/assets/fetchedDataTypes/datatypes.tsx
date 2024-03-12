@@ -1,5 +1,7 @@
-export type ToDoData = {
-    todoName: string,
+export type TodoObject = {
+    todoId?: number,
+    todoItem: string,
     dateCreated: string,
-    isCompleted: boolean
+    isComplete: boolean,
+    isDeleted: boolean,
 }

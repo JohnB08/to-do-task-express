@@ -44,12 +44,15 @@ export const fetchTodoItems = async (userId) => {
         SELECT * FROM fetchTodoItemsByUserId(${userId})
         `);
         const todoItems = data.rows.map(row => {
-            return {
-                todoItem: row.todoItem,
-                dateCreaded: row.dateCreated,
-                isComplete: row.isComplete,
-                isDeleted: row.isDeleted,
-            };
+            if (!row.isDeleted) {
+                return {
+                    todoId: row.todo_id,
+                    todoItem: row.todoItem,
+                    dateCreaded: row.dateCreated,
+                    isComplete: row.isComplete,
+                    isDeleted: row.isDeleted,
+                };
+            }
         });
         return {
             success: true, todoItems
@@ -59,19 +62,41 @@ export const fetchTodoItems = async (userId) => {
         return { success: false, error };
     }
 };
-export const insertTodoItem = async (todoObject) => {
-    const { todoItem, dateCreated } = todoObject;
+export const upDateTodoItem = async (todoObject) => {
+    const { todoId, isComplete, isDeleted } = todoObject;
     try {
         const data = await db.query(`
-        INSERT INTO Todoitems (todoItem, dateCreated)
-        VALUES ('${todoItem}', ${dateCreated})
-        RETURNING todo_id
-        `);
+        UPDATE TodoItems
+        SET isComplete = $1, isDeleted = $2
+        WHERE todo_id = $3
+        `, [isComplete, isDeleted, todoId]);
         return { success: true, data };
     }
     catch (error) {
         return { success: false, error };
     }
+};
+export const insertTodoItem = async (todoObject, id) => {
+    const { todoItem, dateCreated } = todoObject;
+    try {
+        const data = await db.query(`
+        INSERT INTO Todoitems (todoItem, dateCreated)
+        VALUES ($1, $2)
+        RETURNING todo_id
+        `, [todoItem, dateCreated]);
+        const relData = await db.query(`
+        INSERT INTO Todoitem_User_Relation(user_id, todo_id)
+        VALUES (${id}, ${data.rows[0]})
+        `);
+        return { success: true, data, relData };
+    }
+    catch (error) {
+        return { success: false, error };
+    }
+};
+export const updateOrInsert = async (todoObject, user) => {
+    const id = await findUser(user);
+    return todoObject.todoId ? await upDateTodoItem(todoObject) : await insertTodoItem(todoObject, id.data?.rows[0].user_id);
 };
 export const updateUserTable = async (userId, todoId) => {
     try {

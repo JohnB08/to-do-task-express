@@ -4,6 +4,7 @@ import { firebaseAuthHandler, userStatus } from "../../assets/firebaseconfig/fir
 import Style from "./LoginHandler.module.css"
 import { SignOut } from "../SignOut/SignOut"
 import { FirebaseError } from "firebase/app";
+import { useFetchApi, mainUrl } from "../../assets/expressServerFetch/fetchToServer";
 
 
 export default function LoginPage() {
@@ -14,8 +15,8 @@ export default function LoginPage() {
   const [authStyle, setAuthStyle] = useState<string>("");
   const auth = getAuth(firebaseAuthHandler);
   const [showLogin, setShowLogin] = useState<boolean>(true);  
-  const [user] = userStatus()
-  console.log(user)
+  const [user, userToken] = userStatus()
+  console.log(user, userToken)
 
   const handleLogin = async (event: FormEvent) => {
     event.preventDefault();
@@ -87,6 +88,24 @@ export default function LoginPage() {
       setAuthStyle(Style.Error);
     }
   
+  } finally {
+    const idToken = await auth.currentUser?.getIdToken() as string
+    const newOptions: RequestInit = {
+      method: "GET",
+      headers: {
+        id_token: idToken
+      }
+    }
+    console.log(newOptions)
+    const newUrl = `${mainUrl}createNewUser`
+    console.log(newUrl)
+    const setNewUser = await useFetchApi(newUrl, newOptions)
+    if (!setNewUser.success){
+      console.log(setNewUser.error)
+    }
+    else {
+      console.log(setNewUser.result)
+    }
   }
 }
   const toggleForm = () =>{

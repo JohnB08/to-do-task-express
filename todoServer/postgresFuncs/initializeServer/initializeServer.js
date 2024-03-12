@@ -1,4 +1,6 @@
 import { db } from "../../db/db.js";
+import firebase from "firebase-admin";
+import { serviceAccount } from "../../firebase/firebaseConfig/firebaseConfig.js";
 const createUserTable = async () => {
     try {
         const data = await db.query(`
@@ -40,7 +42,7 @@ const makeTodoFetchFunc = async () => {
     try {
         const data = await db.query(`
         CREATE OR REPLACE FUNCTION fetchTodoItemsByUserID(user_id_param INTEGER)
-        RETURNS TABLE (todo_id INTEGER, todoitem VARCHAR(255), datecreated VARCHAR(255), iscomplete BOOLEAN, isdeleted BOOLEAN) AS $$
+        RETURNS TABLE (todo_id INTEGER, todoitem VARCHAR(255), datecreated DATE, iscomplete BOOLEAN, isdeleted BOOLEAN) AS $$
         BEGIN
         RETURN QUERY
             SELECT ti.todo_id, ti.todoitem, ti.datecreated, ti.iscomplete, ti.isdeleted
@@ -56,6 +58,9 @@ const makeTodoFetchFunc = async () => {
         return { success: false, error };
     }
 };
+export const firebaseApp = firebase.initializeApp({
+    credential: firebase.credential.cert(serviceAccount)
+});
 export const initializeServer = async () => {
     const userTable = await createUserTable();
     const todoListTable = await createTodoLists();
