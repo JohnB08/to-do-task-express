@@ -72,7 +72,14 @@ server.get("/todoItems", async (req, res)=>{
             }
         })
     }
-    console.log(user_id.data?.rows)
+    console.log(user_id.data)
+    if (user_id.data?.rowCount === 0){
+        return res.status(404).json({
+            error:{
+                message: "Internal Server Error, missing internal userid"
+            }
+        })
+    }
     const fetchedTodoItems = await fetchTodoItems(user_id.data?.rows[0].user_id)
     if (!fetchedTodoItems.success){
         console.log(fetchedTodoItems.error)
@@ -116,7 +123,8 @@ server.post("/todoItems", async(req, res)=>{
         })
     }
     const user = verifiedToken.user
-    const todoArray:TodoObject[] = req.body 
+    const todoArray:TodoObject[] = req.body
+    console.log(todoArray)
     const errorArray = []
     for (let i = 0; i<todoArray.length; i++){
         const data = await updateOrInsert(todoArray[i], user as string)

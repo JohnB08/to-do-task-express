@@ -47,10 +47,10 @@ export const fetchTodoItems = async (userId) => {
             if (!row.isDeleted) {
                 return {
                     todoId: row.todo_id,
-                    todoItem: row.todoItem,
-                    dateCreaded: row.dateCreated,
-                    isComplete: row.isComplete,
-                    isDeleted: row.isDeleted,
+                    todoItem: row.todoitem,
+                    dateCreated: row.datecreated,
+                    isComplete: row.iscomplete,
+                    isDeleted: row.isdeleted,
                 };
             }
         });
@@ -86,7 +86,7 @@ export const insertTodoItem = async (todoObject, id) => {
         `, [todoItem, dateCreated]);
         const relData = await db.query(`
         INSERT INTO Todoitem_User_Relation(user_id, todo_id)
-        VALUES (${id}, ${data.rows[0]})
+        VALUES (${id}, ${data.rows[0].todo_id})
         `);
         return { success: true, data, relData };
     }
